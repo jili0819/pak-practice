@@ -27,14 +27,16 @@ func JWTMiddleware() mux.MiddlewareFunc {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			tokenStr := r.Header.Get("Authorization")
 			if tokenStr == "" {
-				responseError(w, errcode.New400Error("error"))
+				responseError(w, errcode.New400Error("token is null"))
 				return
 			}
 			claim, err := ParseToken(tokenStr)
 			if err != nil || claim == nil {
-				responseError(w, errcode.New400Error("error"))
+				responseError(w, errcode.New400Error("Authorization error"))
 				return
 			}
+			// redis获取token
+
 			// 设置参数到header中
 			r.Header.Set("user_id", strconv.FormatInt(claim.UserID, 10))
 			next.ServeHTTP(w, r)
