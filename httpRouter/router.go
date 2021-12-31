@@ -14,7 +14,7 @@ func StartRouter() {
 	router := mux.NewRouter()
 	v1 := router.PathPrefix("/api/v1").Subrouter()
 	v1.NotFoundHandler = http.NotFoundHandler()
-	v1.Name("fa")
+
 	v1.MethodNotAllowedHandler = http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(http.StatusMethodNotAllowed)
 		return
