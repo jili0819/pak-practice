@@ -1,7 +1,16 @@
 package main
 
-import "github.com/jili/pkg-practice/httpRouter"
+import "fmt"
 
 func main() {
-	httpRouter.StartRouter()
+	a := make(map[string]A)
+	a["a"] = A{
+		Age: 10,
+	}
+	c := a["b"]
+	fmt.Println(fmt.Sprintf("%", c))
+}
+
+type A struct {
+	Age int
 }

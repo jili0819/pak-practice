@@ -1,211 +1,84 @@
-package log
+package main
 
 import (
+	"errors"
 	"fmt"
-	"io"
-	stdlog "log"
+	"github.com/natefinch/lumberjack"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"os"
 	"sync"
+	"time"
 )
-
-// Level represents a log level.
-type Level int32
 
 const (
-	// DebugLevel is the lowest level of logging.
-	// Debug logs are intended for debugging and development purposes.
-	DebugLevel Level = iota
-
-	// InfoLevel is used for general informational log messages.
-	InfoLevel
-
-	// WarnLevel is used for undesired but relatively expected events,
-	// which may indicate a problem.
-	WarnLevel
-
-	// ErrorLevel is used for undesired and unexpected events that
-	// the program can recover from.
-	ErrorLevel
-
-	// FatalLevel is used for undesired and unexpected events that
-	// the program cannot recover from.
-	FatalLevel
+	SERVICE_NAME = "demo_log"
+	MODE         = "pro"
 )
 
-// Base supports logging at various log levels.
-type Base interface {
-	// Debug logs a message at Debug level.
-	Debug(args ...interface{})
+var _onceInit sync.Once
+var log *zap.Logger
+var writer zapcore.WriteSyncer
 
-	// Info logs a message at Info level.
-	Info(args ...interface{})
+func main() {
+	var a [1]int64
+	a[0] = time.Now().Local().Unix()
+	fmt.Println(a[0])
+	//a[1] = time.Now().Local().Unix()
 
-	// Warn logs a message at Warning level.
-	Warn(args ...interface{})
-
-	// Error logs a message at Error level.
-	Error(args ...interface{})
-
-	// Fatal logs a message at Fatal level
-	// and process will exit with status set to 1.
-	Fatal(args ...interface{})
-}
-
-type baseLogger struct {
-	*stdlog.Logger
-}
-
-// Logger logs message to io.Writer at various log levels.
-type Logger struct {
-	base Base
-
-	mu sync.Mutex
-	// Minimum log level for this logger.
-	// Message with level lower than this level won't be outputted.
-	level Level
-
-	// if log file
-	fileName string
-}
-
-// Debug logs a message at Debug level.
-func (l *baseLogger) Debug(args ...interface{}) {
-	l.prefixPrint("DEBUG: ", args...)
-}
-
-// Info logs a message at Info level.
-func (l *baseLogger) Info(args ...interface{}) {
-	l.prefixPrint("INFO: ", args...)
-}
-
-// Warn logs a message at Warning level.
-func (l *baseLogger) Warn(args ...interface{}) {
-	l.prefixPrint("WARN: ", args...)
-}
-
-// Error logs a message at Error level.
-func (l *baseLogger) Error(args ...interface{}) {
-	l.prefixPrint("ERROR: ", args...)
-}
-
-// Fatal logs a message at Fatal level
-// and process will exit with status set to 1.
-func (l *baseLogger) Fatal(args ...interface{}) {
-	l.prefixPrint("FATAL: ", args...)
-	os.Exit(1)
-}
-
-func (l *baseLogger) prefixPrint(prefix string, args ...interface{}) {
-	args = append([]interface{}{prefix}, args...)
-	l.Print(args...)
-}
-
-// NewBase creates and returns a new instance of baseLogger.
-func NewBase(out io.Writer) *baseLogger {
-	prefix := fmt.Sprintf("process: pid=%d ", os.Getpid())
-	return &baseLogger{
-		stdlog.New(out, prefix, stdlog.Ldate|stdlog.Ltime|stdlog.Lmicroseconds|stdlog.Lshortfile|stdlog.LUTC),
+	/*core := zapcore.NewCore(getEncoder(), getWriteSyncer(), zapcore.DebugLevel)
+	zap.New(core, zap.AddCaller())*/
+	_onceInit.Do(func() {
+		fmt.Println("init log")
+		writer = getStdLogWriter()
+		if MODE == "pro" {
+			writer = getFileLogWriter()
+		}
+		// 开启开发模式，堆栈跟踪
+		caller := zap.AddCaller()
+		// 开启文件及行号
+		development := zap.Development()
+		// 设置初始化字段,如：添加一个服务器名称
+		filed := zap.Fields(zap.String("serviceName", SERVICE_NAME))
+		log = zap.New(
+			zapcore.NewCore(getEncoder(), writer, zapcore.DebugLevel),
+			caller,
+			development,
+			filed,
+		)
+	})
+	for i := 0; i < 100; i++ {
+		log.Error("this is error message", zap.Error(errors.New("error test")))
+		log.Info("this is info message", zap.Any("a", "any value"))
 	}
+	time.Sleep(100 * time.Second)
 }
 
-// NewLogger creates and returns a new instance of Logger.
-// Log level is set to DebugLevel by default.
-func NewLogger(base Base) *Logger {
-	if base == nil {
-		base = NewBase(os.Stderr)
+func getEncoder() zapcore.Encoder {
+	encoderConfig := zap.NewDevelopmentEncoderConfig()
+	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder // 修改时间编码器
+	encoderConfig.MessageKey = "message"
+	encoderConfig.LevelKey = "level"
+	encoderConfig.TimeKey = "timestamp"
+	encoderConfig.CallerKey = "file"
+	// 在日志文件中使用大写字母记录日志级别
+	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
+	// NewConsoleEncoder 打印更符合人们观察的方式
+	return zapcore.NewJSONEncoder(encoderConfig)
+}
+
+func getFileLogWriter() zapcore.WriteSyncer {
+	lumberJackLogger := &lumberjack.Logger{
+		Filename:   "./log/" + SERVICE_NAME + ".log", // 日志文件的位置；
+		MaxSize:    1,                                // 在进行切割之前，日志文件的最大大小（以MB为单位）；
+		MaxBackups: 10,                               // 保留旧文件的最大个数；
+		MaxAge:     30,                               // 保留旧文件的最大天数；
+		Compress:   false,                            // 是否压缩/归档旧文件；
 	}
-	return &Logger{base: base, level: DebugLevel}
+	return zapcore.AddSync(lumberJackLogger)
+
 }
 
-// String is part of the fmt.Stringer interface.
-//
-// Used for testing and debugging purposes.
-func (l Level) String() string {
-	switch l {
-	case DebugLevel:
-		return "debug"
-	case InfoLevel:
-		return "info"
-	case WarnLevel:
-		return "warning"
-	case ErrorLevel:
-		return "error"
-	case FatalLevel:
-		return "fatal"
-	default:
-		return "unknown"
-	}
-}
-
-// canLogAt reports whether logger can log at level v.
-func (l *Logger) canLogAt(v Level) bool {
-	l.mu.Lock()
-	defer l.mu.Unlock()
-	return v >= l.level
-}
-
-func (l *Logger) Debug(args ...interface{}) {
-	if !l.canLogAt(DebugLevel) {
-		return
-	}
-	l.base.Debug(args...)
-}
-
-func (l *Logger) Info(args ...interface{}) {
-	if !l.canLogAt(InfoLevel) {
-		return
-	}
-	l.base.Info(args...)
-}
-
-func (l *Logger) Warn(args ...interface{}) {
-	if !l.canLogAt(WarnLevel) {
-		return
-	}
-	l.base.Warn(args...)
-}
-
-func (l *Logger) Error(args ...interface{}) {
-	if !l.canLogAt(ErrorLevel) {
-		return
-	}
-	l.base.Error(args...)
-}
-
-func (l *Logger) Fatal(args ...interface{}) {
-	if !l.canLogAt(FatalLevel) {
-		return
-	}
-	l.base.Fatal(args...)
-}
-
-func (l *Logger) Debugf(format string, args ...interface{}) {
-	l.Debug(fmt.Sprintf(format, args...))
-}
-
-func (l *Logger) Infof(format string, args ...interface{}) {
-	l.Info(fmt.Sprintf(format, args...))
-}
-
-func (l *Logger) Warnf(format string, args ...interface{}) {
-	l.Warn(fmt.Sprintf(format, args...))
-}
-
-func (l *Logger) Errorf(format string, args ...interface{}) {
-	l.Error(fmt.Sprintf(format, args...))
-}
-
-func (l *Logger) Fatalf(format string, args ...interface{}) {
-	l.Fatal(fmt.Sprintf(format, args...))
-}
-
-// SetLevel sets the logger level.
-// It panics if v is less than DebugLevel or greater than FatalLevel.
-func (l *Logger) SetLevel(v Level) {
-	l.mu.Lock()
-	defer l.mu.Unlock()
-	if v < DebugLevel || v > FatalLevel {
-		panic("log: invalid log level")
-	}
-	l.level = v
+func getStdLogWriter() zapcore.WriteSyncer {
+	return zapcore.AddSync(os.Stdout)
 }
