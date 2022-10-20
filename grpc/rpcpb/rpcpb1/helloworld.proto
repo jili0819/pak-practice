@@ -1,5 +1,8 @@
 syntax = "proto3";
-option go_package = "github.com/jili/pkg-practice/rpcpb";
+
+package rpcpb1;
+
+option go_package = "github.com/jili/pkg-practice/grpc/rpcpb/rpcpb1";
 
 // The greeting service definition.
 service Greeter {

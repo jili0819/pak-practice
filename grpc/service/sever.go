@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/jili/pkg-practice/grpc/rpcpb"
+	"github.com/jili/pkg-practice/grpc/rpcpb/rpcpb1"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -11,13 +11,13 @@ import (
 
 // server is used to implement helloworld.GreeterServer.
 type server struct {
-	rpcpb.UnimplementedGreeterServer
+	rpcpb1.UnimplementedGreeterServer
 }
 
 // SayHello implements helloworld.GreeterServer
-func (s *server) SayHello(ctx context.Context, in *rpcpb.HelloRequest) (*rpcpb.HelloReply, error) {
+func (s *server) SayHello(ctx context.Context, in *rpcpb1.HelloRequest) (*rpcpb1.HelloReply, error) {
 	log.Printf("Received: %v", in.GetName())
-	return &rpcpb.HelloReply{Message: "Hello " + in.GetName()}, nil
+	return &rpcpb1.HelloReply{Message: "Hello " + in.GetName()}, nil
 }
 
 func main() {
@@ -26,7 +26,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	rpcpb.RegisterGreeterServer(s, &server{})
+	rpcpb1.RegisterGreeterServer(s, &server{})
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
