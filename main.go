@@ -1,16 +1,15 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math/rand"
+	"time"
+)
 
 func main() {
-	a := make(map[string]A)
-	a["a"] = A{
-		Age: 10,
-	}
-	c := a["b"]
-	fmt.Println(fmt.Sprintf("%", c))
-}
-
-type A struct {
-	Age int
+	rand.Seed(time.Now().UnixNano())
+	fmt.Println(rand.Intn(4) + 1)
+	fmt.Println(rand.Intn(2) + 1)
+	fmt.Println(rand.Intn(4) + 1)
+	fmt.Println(rand.Intn(2) + 1)
 }
