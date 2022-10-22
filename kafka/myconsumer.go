@@ -47,39 +47,42 @@ func main() {
 		fmt.Println("------MyConsumer--------:", info.Name, time.Now().Format("2006-01-02 15:04:05"))
 	})
 
-	go func() {
-		if err := aa.Consumer.BaseConsumer.SubscribeTopics(aa.Topics, nil); err != nil {
-			log.Fatalf("kafka消费错误", zap.Error(err), zap.String("err", err.Error()))
-		}
-		for {
-			//fmt.Println(aa.Consumer.BaseConsumer.ReadMessage(-1))
-
-			ev := aa.Consumer.BaseConsumer.Poll(100)
-			if ev == nil {
-				continue
+	for i := 0; i < 10; i++ {
+		go func() {
+			if err := aa.Consumer.BaseConsumer.SubscribeTopics(aa.Topics, nil); err != nil {
+				log.Fatalf("kafka消费错误", zap.Error(err), zap.String("err", err.Error()))
 			}
+			for {
+				//fmt.Println(aa.Consumer.BaseConsumer.ReadMessage(-1))
 
-			switch e := ev.(type) {
-			case *kafka.Message:
-				aa.Consumer.Callback(e.TopicPartition, e.Value)
-			case kafka.Error:
-				// Errors should generally be considered
-				// informational, the client will try to
-				// automatically recover.
-				// But in this example we choose to terminate
-				// the application if all brokers are down.
-				fmt.Fprintf(os.Stderr, "%% Error: %v: %v\n", e.Code(), e)
-				break
-			default:
-				fmt.Printf("Ignored %v\n", e)
+				ev := aa.Consumer.BaseConsumer.Poll(100)
+				if ev == nil {
+					continue
+				}
+
+				switch e := ev.(type) {
+				case *kafka.Message:
+					aa.Consumer.Callback(e.TopicPartition, e.Value)
+				case kafka.Error:
+					// Errors should generally be considered
+					// informational, the client will try to
+					// automatically recover.
+					// But in this example we choose to terminate
+					// the application if all brokers are down.
+					fmt.Fprintf(os.Stderr, "%% Error: %v: %v\n", e.Code(), e)
+					break
+				default:
+					fmt.Printf("Ignored %v\n", e)
+				}
+				// aa.Consumer.Callback(msg.TopicPartition, msg.Value)
+				/*ev := <-aa.Consumer.BaseConsumer.Events()
+				switch e := ev.(type) {
+				case *kafka.Message:
+					aa.Consumer.Callback(e.TopicPartition, e.Value)
+				}*/
 			}
-			// aa.Consumer.Callback(msg.TopicPartition, msg.Value)
-			/*ev := <-aa.Consumer.BaseConsumer.Events()
-			switch e := ev.(type) {
-			case *kafka.Message:
-				aa.Consumer.Callback(e.TopicPartition, e.Value)
-			}*/
-		}
-	}()
+		}()
+	}
+
 	time.Sleep(1 * time.Hour)
 }
