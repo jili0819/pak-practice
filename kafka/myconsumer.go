@@ -33,7 +33,7 @@ func NewMyConsumer(topics []string, groupId, offset string, callBack MyConsumerC
 func (c *MyConsumer) callBack(partition kafka.TopicPartition, msg []byte) {
 	// todo 自定义方法,msg string->json->struct{}
 
-	// fmt.Println(string(msg))
+	fmt.Println("消息所在partition：", *partition.Topic, partition.Partition)
 	var temp types.MyConsumerInfo
 	if err := json.Unmarshal(msg, &temp); err != nil {
 		fmt.Println("err:", err)
@@ -48,7 +48,7 @@ func main() {
 	})
 
 	for i := 0; i < 10; i++ {
-		go func() {
+		go func(index int) {
 			if err := aa.Consumer.BaseConsumer.SubscribeTopics(aa.Topics, nil); err != nil {
 				log.Fatalf("kafka消费错误", zap.Error(err), zap.String("err", err.Error()))
 			}
@@ -62,6 +62,7 @@ func main() {
 
 				switch e := ev.(type) {
 				case *kafka.Message:
+					fmt.Println("消费者groupId:", index)
 					aa.Consumer.Callback(e.TopicPartition, e.Value)
 				case kafka.Error:
 					// Errors should generally be considered
@@ -81,7 +82,7 @@ func main() {
 					aa.Consumer.Callback(e.TopicPartition, e.Value)
 				}*/
 			}
-		}()
+		}(i)
 	}
 
 	time.Sleep(1 * time.Hour)
