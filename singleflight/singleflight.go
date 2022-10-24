@@ -8,9 +8,23 @@ import (
 )
 
 func main() {
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-	fmt.Println(getData(ctx, "keys"))
+	var sg singleflight.Group
+	var b *A
+	result, _, _ := sg.Do("111", func() (interface{}, error) {
+		return &A{
+			Name: "w",
+		}, nil
+	})
+	b = result.(*A)
+	fmt.Println(b)
 
+	/*ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	fmt.Println(getData(ctx, "keys"))*/
+
+}
+
+type A struct {
+	Name string `json:"name"`
 }
 
 // 超时控制
