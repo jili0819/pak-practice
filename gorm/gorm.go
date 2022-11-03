@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/gofrs/uuid"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"time"
@@ -15,7 +14,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	infos := make([]TestTableA, 0)
+	/*infos := make([]TestTableA, 0)
 	for i := 0; i < 1000000; i++ {
 		v4uuid, err := uuid.NewV4()
 		if err != nil {
@@ -23,7 +22,15 @@ func main() {
 		}
 		infos = append(infos, TestTableA{Uuid: v4uuid.String()})
 	}
-	_ = db.CreateInBatches(&infos, 2000)
+	_ = db.CreateInBatches(&infos, 2000)*/
+	fmt.Println("----------")
+	var total bool
+	//times := time.Now().Format("2006-01-02 15:04:05")
+	if err = db.Debug().Model(B{}).Select("count(1) > 0").Where("id  = ?", 1000).Find(&total).Error; err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	fmt.Println("total:", total)
 }
 
 type TestTableA struct {
@@ -34,4 +41,14 @@ type TestTableA struct {
 
 func (m *TestTableA) TableName() string {
 	return "test_table_a"
+}
+
+type B struct {
+	Id        uint      `gorm:"column:id;type:int(11) unsigned;primary_key" json:"id"`
+	StartTime time.Time `gorm:"column:start_time;type:timestamp;default:CURRENT_TIMESTAMP;NOT NULL" json:"start_time"`
+	EndTime   time.Time `gorm:"column:end_time;type:timestamp;default:CURRENT_TIMESTAMP;NOT NULL" json:"end_time"`
+}
+
+func (m *B) TableName() string {
+	return "b"
 }
