@@ -28,6 +28,7 @@ func main() {
 	}
 	s := grpc.NewServer()
 	rpcpb1.RegisterGreeterServer(s, &server{})
+	// grpcui -plaintext 127.0.0.1:8090
 	reflection.Register(s) // grpcui本地测试调用grpc服务
 	if err = s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
