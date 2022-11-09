@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package rpcpb1;
+package rpcpb2;
 
-option go_package = "grpc/rpcpb/rpcpb1";
+option go_package = "grpc/rpcpb/rpcpb2";
 
 // The greeting service definition.
 service Greeter {
@@ -13,6 +13,7 @@ service Greeter {
 // The request message containing the user's name.
 message HelloRequest {
   string name = 1;
+  string title = 2;
 }
 
 // The response message containing the greetings
@@ -22,4 +23,4 @@ message HelloReply {
 
 // generate pb.go
 // 项目根目录下执行即可
-// protoc --go_out=. --go-grpc_out=. grpc/rpcpb/rpcpb2/helloworld.proto
+// protoc --go_out=. --go-grpc_out=. grpc/rpcpb/rpcpb2/helloworlds.proto
