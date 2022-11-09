@@ -6,6 +6,7 @@ require (
 	github.com/BurntSushi/toml v1.2.0 // indirect
 	github.com/confluentinc/confluent-kafka-go v1.9.2
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/fullstorydev/grpcui v1.3.1 // indirect
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-playground/validator/v10 v10.11.1 // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
@@ -13,8 +14,10 @@ require (
 	github.com/gofrs/uuid v4.3.0+incompatible
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/gorilla/mux v1.8.0
+	github.com/jhump/protoreflect v1.12.0
 	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/natefinch/lumberjack v2.0.0+incompatible
+	github.com/panjf2000/ants/v2 v2.6.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.5 // indirect
 	github.com/philchia/agollo/v4 v4.1.4
 	github.com/pkg/errors v0.9.1 // indirect

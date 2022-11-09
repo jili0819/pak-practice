@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/jili/pkg-practice/grpc/rpcpb/rpcpb1"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
 )
@@ -21,13 +22,14 @@ func (s *server) SayHello(ctx context.Context, in *rpcpb1.HelloRequest) (*rpcpb1
 }
 
 func main() {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 80))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 8090))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
 	rpcpb1.RegisterGreeterServer(s, &server{})
-	if err := s.Serve(lis); err != nil {
+	reflection.Register(s) // grpcui本地测试调用grpc服务
+	if err = s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
 }
