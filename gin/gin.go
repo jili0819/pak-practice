@@ -1,44 +1,43 @@
 package main
 
 import (
-	"fmt"
-	"github.com/panjf2000/ants/v2"
-	"time"
+	"github.com/gin-gonic/gin"
+	"github.com/jili/pkg-practice/api"
+	"strconv"
 )
 
-func main() {
-	cronCh := make(chan uint)
-	go PushToEs(cronCh)
-	cronCh <- 1
-	time.Sleep(2 * time.Second)
-	cronCh <- 2
-	time.Sleep(2 * time.Second)
-	cronCh <- 3
-	time.Sleep(2 * time.Second)
-	cronCh <- 4
-	time.Sleep(2 * time.Second)
-	close(cronCh)
-	time.Sleep(1 * time.Hour)
+type TypeName struct {
+	Bs []string `json:"bs"`
 }
-func PushToEs(cronCh chan uint) {
-	p, _ := ants.NewPool(10)
-	p.Running()
-	defer p.Release()
-	//ctx := context.Background()
-	for {
-		select {
-		case v, ok := <-cronCh:
-			if !ok {
-				goto ExitPush
-			}
-			if err := ants.Submit(func() {
-				fmt.Println(v)
-			}); err != nil {
-				fmt.Println(err)
-			}
+type A struct {
+	Name     string   `json:"name" xml:"name"`
+	Password string   `json:"password" xml:"password"`
+	T        TypeName `json:"t" xml:"t"`
+}
+
+func main() {
+	g := gin.Default()
+	g.GET("/json", func(c *gin.Context) {
+		var ss []A
+		for i := 0; i < 10; i++ {
+			ss = append(ss, A{
+				Name:     "name_" + strconv.Itoa(i),
+				Password: "pass_" + strconv.Itoa(i),
+				T: TypeName{
+					Bs: []string{"1", "fw"},
+				},
+			})
 		}
-	}
-ExitPush:
-	fmt.Println("end")
-	return
+		api.WriteSuccessResponseJSON(c.Writer, ss)
+	})
+	g.GET("/xml", func(c *gin.Context) {
+		api.WriteSuccessResponseXML(c.Writer, A{
+			Name:     "fw",
+			Password: "fw",
+			T: TypeName{
+				Bs: []string{"1", "fw"},
+			},
+		})
+	})
+	g.Run()
 }
