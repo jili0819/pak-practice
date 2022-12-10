@@ -1,9 +1,8 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/jili/pkg-practice/api"
-	"strconv"
 )
 
 type TypeName struct {
@@ -15,7 +14,26 @@ type A struct {
 	T        TypeName `json:"t" xml:"t"`
 }
 
+type Req struct {
+	Name string `form:"name"`
+}
+
 func main() {
+	g := gin.Default()
+	g.GET("/get", func(context *gin.Context) {
+		a := Req{}
+		context.Bind(&a)
+		fmt.Printf("%#v", a)
+	})
+	g.POST("/post", func(context *gin.Context) {
+		var a Req
+		context.Bind(&a)
+		fmt.Printf("%#v", a)
+	})
+	g.Run()
+}
+
+/*func main() {
 	g := gin.Default()
 	g.GET("/json", func(c *gin.Context) {
 		var ss []A
@@ -40,4 +58,4 @@ func main() {
 		})
 	})
 	g.Run()
-}
+}*/
