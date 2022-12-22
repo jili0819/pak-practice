@@ -43,3 +43,7 @@ func NewApiImpls(facType interface{}) ApiInter {
 	}
 	return &WrangleImpls{}
 }
+
+func main() {
+	NewApiImpls(new(SpeakImpls))
+}

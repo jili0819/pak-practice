@@ -1,8 +1,6 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // (责任链模式)责任链模式是一种行为设计模式， 允许你将请求沿着处理者链进行发送。收到请求后，每个处理者均可对请求进行处理，或将其传递给链上的下个处理者。
 //该模式允许多个对象来对请求进行处理，而无需让发送者类与具体接收者类相耦合。链可在运行时由遵循标准处理者接口的任意处理者动态生成。
@@ -179,4 +177,16 @@ func BuildPassenger() BoardingProcessor {
 	qualityCheckNode.SetNextProcessor(completeBoardingNode)
 
 	return boardingPassNode
+}
+
+func main() {
+	passenger := BuildPassenger()
+	if err := passenger.ProcessFor(&Passenger{
+		name:       "张三",
+		hasLuggage: true,
+	}); err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("success")
 }

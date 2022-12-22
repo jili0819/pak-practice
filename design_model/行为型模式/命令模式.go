@@ -103,3 +103,26 @@ func (e *ElectricCooker) Run(duration string) string {
 func (e *ElectricCooker) Shutdown() string {
 	return "电饭煲停止运行。"
 }
+
+func main() {
+	// 创建电饭煲，命令接受者
+	electricCooker := new(ElectricCooker)
+	// 创建电饭煲指令触发器
+	electricCookerInvoker := new(ElectricCookerInvoker)
+	// 停止
+	shutdownCmd := NewShutdownCommand(electricCooker)
+
+	// 蒸饭
+	steamRiceCmd := NewSteamRiceCommand(electricCooker)
+	electricCookerInvoker.SetCookCommand(steamRiceCmd)
+	fmt.Println(electricCookerInvoker.ExecuteCookCommand())
+	electricCookerInvoker.SetCookCommand(shutdownCmd)
+	fmt.Println(electricCookerInvoker.ExecuteCookCommand())
+
+	// 煮粥
+	cookCongeeCmd := NewCookCongeeCommand(electricCooker)
+	electricCookerInvoker.SetCookCommand(cookCongeeCmd)
+	fmt.Println(electricCookerInvoker.ExecuteCookCommand())
+	electricCookerInvoker.SetCookCommand(shutdownCmd)
+	fmt.Println(electricCookerInvoker.ExecuteCookCommand())
+}
