@@ -2,13 +2,15 @@ package main
 
 import (
 	"fmt"
-	"time"
+	"github.com/shopspring/decimal"
 )
+
+const a = 1000
 
 func main() {
 
 	//var a time.Time
-	b := time.Unix(0, 0)
-	fmt.Println(b)
 
+	b := int(decimal.NewFromFloat32(9.9).Mul(decimal.NewFromFloat32(100)).IntPart())
+	fmt.Println(b)
 }
