@@ -19,7 +19,7 @@ import "fmt"
 type (
 	// BoardingProcessor 登机过程中，各节点统一处理接口
 	BoardingProcessor interface {
-		SetNextProcessor(processor BoardingProcessor)
+		SetNextProcessor(processor BoardingProcessor) BoardingProcessor
 		ProcessFor(passenger *Passenger) error
 	}
 
@@ -42,8 +42,9 @@ type (
 )
 
 // SetNextProcessor 基类中统一实现设置下一个处理器方法
-func (b *baseBoardingProcessor) SetNextProcessor(processor BoardingProcessor) {
+func (b *baseBoardingProcessor) SetNextProcessor(processor BoardingProcessor) BoardingProcessor {
 	b.nextProcessor = processor
+	return processor
 }
 
 // ProcessFor 基类中统一实现下一个处理器流转
@@ -158,24 +159,13 @@ func (c *completeBoardingProcessor) ProcessFor(passenger *Passenger) (err error)
 func BuildPassenger() BoardingProcessor {
 	// 登记牌
 	boardingPassNode := &boardingPassProcessor{}
-	// 新一托运
-	luggageCheckInNode := &luggageCheckInProcessor{}
-	// 身份校验
-	identityCheckNode := &identityCheckProcessor{}
-	// 安检
-	securityCheckNode := &securityCheckProcessor{}
-	// 质检
-	qualityCheckNode := &qualityCheckProcessor{}
-	// 登机完成
-	completeBoardingNode := &completeBoardingProcessor{}
-
-	// process start
-	boardingPassNode.SetNextProcessor(luggageCheckInNode)
-	luggageCheckInNode.SetNextProcessor(identityCheckNode)
-	identityCheckNode.SetNextProcessor(securityCheckNode)
-	securityCheckNode.SetNextProcessor(qualityCheckNode)
-	qualityCheckNode.SetNextProcessor(completeBoardingNode)
-
+	// process start // 新一托运=>身份校验=>安检=>质检=>登机完成
+	boardingPassNode.
+		SetNextProcessor(&luggageCheckInProcessor{}).
+		SetNextProcessor(&identityCheckProcessor{}).
+		SetNextProcessor(&securityCheckProcessor{}).
+		SetNextProcessor(&qualityCheckProcessor{}).
+		SetNextProcessor(&completeBoardingProcessor{})
 	return boardingPassNode
 }
 
