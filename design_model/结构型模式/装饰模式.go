@@ -48,7 +48,7 @@ func NewSecurityCheckDecorator(station Station) *securityCheckDecorator {
 }
 
 func (s *securityCheckDecorator) Enter() string {
-	return "行李通过安检；" + s.station.Enter()
+	return "行李通过安检=》" + s.station.Enter()
 }
 
 func NewEpidemicProtectionDecorator(station Station) *epidemicProtectionDecorator {
@@ -58,7 +58,7 @@ func NewEpidemicProtectionDecorator(station Station) *epidemicProtectionDecorato
 }
 
 func (e *epidemicProtectionDecorator) Enter() string {
-	return "测量体温，佩戴口罩；" + e.station.Enter()
+	return "测量体温，佩戴口罩=》" + e.station.Enter()
 }
 
 func main() {
