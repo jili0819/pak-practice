@@ -49,13 +49,13 @@ func main() {
 
 	for i := 0; i < 10; i++ {
 		go func(index int) {
-			if err := aa.Consumer.BaseConsumer.SubscribeTopics(aa.Topics, nil); err != nil {
+			if err := aa.Consumer.Base.SubscribeTopics(aa.Topics, nil); err != nil {
 				log.Fatalf("kafka消费错误", zap.Error(err), zap.String("err", err.Error()))
 			}
 			for {
 				//fmt.Println(aa.Consumer.BaseConsumer.ReadMessage(-1))
 
-				ev := aa.Consumer.BaseConsumer.Poll(100)
+				ev := aa.Consumer.Base.Poll(100)
 				if ev == nil {
 					continue
 				}
