@@ -33,7 +33,7 @@ func lock01() {
 	// 业务处理
 	g.Go(func() error {
 		fmt.Println("执行业务开始")
-		time.Sleep(1 * time.Second)
+		time.Sleep(5 * time.Second)
 		fmt.Println("执行业务结束")
 		ch <- true
 		close(ch)
@@ -46,7 +46,7 @@ func lock01() {
 			select {
 			case <-ticker.C:
 				fmt.Println("定时续期分布式锁有效期")
-				_, err := client.Expire(context.Background(), key, 3*time.Second).Result()
+				_, err := client.Expire(context.Background(), key, 2*time.Second).Result()
 				if err != nil {
 					log.Println(err.Error())
 					return err
@@ -61,6 +61,7 @@ func lock01() {
 				}
 				return nil
 			}
+			time.Sleep(10 * time.Millisecond)
 		}
 	})
 	if err := g.Wait(); err != nil {
