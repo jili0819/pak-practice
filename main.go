@@ -8,6 +8,14 @@ import (
 const a = 1000
 
 func main() {
+	a := []int{0, 1, 2, 3, 4, 5}
+	b := a[0:3]
+	fmt.Println(len(a), cap(a))
+	fmt.Println(len(b), cap(b))
+	b[0] = 1
+	fmt.Println(a, b)
+	return
+
 	chans := make(chan int, 100)
 	closeChan := make(chan bool)
 	go test01(chans, closeChan)
