@@ -4,13 +4,19 @@ import (
 	"context"
 	"github.com/jili/pkg-practice/grpc/rpcpb/rpcpb1"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/credentials"
 	"log"
 	"time"
 )
 
 func main() {
-	conn, err := grpc.Dial(":80", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	//从输入的证书文件中为客户端构造TLS凭证
+	creds, err := credentials.NewClientTLSFromFile("../pkg/tls/server.pem", "go-grpc-example")
+	if err != nil {
+		log.Fatalf("Failed to create TLS credentials %v", err)
+	}
+
+	conn, err := grpc.Dial(":80", grpc.WithTransportCredentials(creds))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}

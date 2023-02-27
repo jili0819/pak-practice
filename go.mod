@@ -3,7 +3,6 @@ module github.com/jili/pkg-practice
 go 1.16
 
 require (
-	github.com/BurntSushi/toml v1.2.0 // indirect
 	github.com/confluentinc/confluent-kafka-go v1.9.2
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fullstorydev/grpcui v1.3.1 // indirect
@@ -20,8 +19,10 @@ require (
 	github.com/panjf2000/ants/v2 v2.6.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.5 // indirect
 	github.com/philchia/agollo/v4 v4.1.4
-	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pkg/errors v0.9.1
+	github.com/prometheus/common v0.26.0
 	github.com/shopspring/decimal v1.3.1 // indirect
+	github.com/urfave/cli/v2 v2.24.4 // indirect
 	go.etcd.io/etcd/client/v3 v3.5.6 // indirect
 	go.opentelemetry.io/otel v1.11.1 // indirect
 	go.opentelemetry.io/otel/trace v1.11.1 // indirect
