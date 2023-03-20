@@ -3,41 +3,28 @@ module github.com/jili/pkg-practice
 go 1.16
 
 require (
-	github.com/HouzuoGuo/tiedot v0.0.0-20210905174726-ae1e16866d06 // indirect
+	github.com/apache/rocketmq-client-go/v2 v2.1.1
 	github.com/confluentinc/confluent-kafka-go v1.9.2
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/fullstorydev/grpcui v1.3.1 // indirect
-	github.com/gin-gonic/gin v1.8.1
-	github.com/go-playground/validator/v10 v10.11.1 // indirect
-	github.com/go-redis/redis/v8 v8.11.5 // indirect
-	github.com/goccy/go-json v0.9.11 // indirect
+	github.com/gin-gonic/gin v1.9.0
+	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.3.0+incompatible
-	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/gorilla/mux v1.8.0
-	github.com/jhump/protoreflect v1.12.0
-	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/natefinch/lumberjack v2.0.0+incompatible
-	github.com/panjf2000/ants/v2 v2.6.0 // indirect
-	github.com/pelletier/go-toml/v2 v2.0.5 // indirect
+	github.com/panjf2000/ants/v2 v2.6.0
 	github.com/philchia/agollo/v4 v4.1.4
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/common v0.26.0
-	github.com/shopspring/decimal v1.3.1 // indirect
-	github.com/urfave/cli/v2 v2.24.4 // indirect
-	go.etcd.io/etcd/client/v3 v3.5.6 // indirect
-	go.opentelemetry.io/otel v1.11.1 // indirect
-	go.opentelemetry.io/otel/trace v1.11.1 // indirect
+	github.com/stretchr/testify v1.8.2 // indirect
+	github.com/urfave/cli/v2 v2.24.4
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/goleak v1.2.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.23.0
-	golang.org/x/crypto v0.1.0 // indirect
-	golang.org/x/net v0.4.0 // indirect
 	golang.org/x/sync v0.1.0
 	google.golang.org/genproto v0.0.0-20221207170731-23e4bf6bdc37 // indirect
 	google.golang.org/grpc v1.51.0
 	google.golang.org/protobuf v1.28.1
-	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gorm.io/driver/mysql v1.4.3
 	gorm.io/gorm v1.24.0
 )
