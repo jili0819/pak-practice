@@ -27,4 +27,6 @@ require (
 	google.golang.org/protobuf v1.28.1
 	gorm.io/driver/mysql v1.4.3
 	gorm.io/gorm v1.24.0
+	mosn.io/holmes v1.1.0
+	mosn.io/pkg v1.4.0 // indirect
 )
