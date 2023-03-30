@@ -20,8 +20,6 @@ var (
 	ca         = tlsDir + "/ca.crt"
 	server_crt = tlsDir + "/server.crt"
 	server_key = tlsDir + "/server.key"
-	client_crt = tlsDir + "/client.crt"
-	client_key = tlsDir + "/client.key"
 )
 
 // server is used to implement helloworld.GreeterServer.
@@ -63,7 +61,9 @@ func main() {
 	})
 
 	s := grpc.NewServer(grpc.Creds(creds))
+	defer s.GracefulStop()
 	rpcpb1.RegisterGreeterServer(s, &server{})
+
 	// grpcui -plaintext 127.0.0.1:8090
 	reflection.Register(s) // grpcui本地测试调用grpc服务
 	if err = s.Serve(lis); err != nil {

@@ -3,10 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"mosn.io/holmes"
-	mlog "mosn.io/pkg/log"
 	"runtime"
-	"time"
 )
 
 type TypeName struct {
@@ -25,16 +22,19 @@ type Req struct {
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU() - 1)
 	// proof auto
-	h, _ := holmes.New(
-		holmes.WithCollectInterval("2s"),
-		holmes.WithDumpPath("./tmp"),
-		holmes.WithLogger(holmes.NewFileLog("./tmp/holmes.log", mlog.DEBUG)),
-		holmes.WithTextDump(),
-		holmes.WithMemDump(3, 25, 80, time.Second),
-	)
-	h.EnableMemDump().Start()
+	//h, _ := holmes.New(
+	//	holmes.WithCollectInterval("2s"),
+	//	holmes.WithDumpPath("./tmp"),
+	//	holmes.WithLogger(holmes.NewFileLog("./tmp/holmes.log", mlog.DEBUG)),
+	//	holmes.WithTextDump(),
+	//	holmes.WithMemDump(3, 25, 80, time.Second),
+	//)
+	//h.EnableMemDump().Start()
 
 	g := gin.Default()
+	g.GET("/", func(c *gin.Context) {
+		return
+	})
 	g.GET("/get", func(c *gin.Context) {
 		data := "Hello, go-stress-testing! \n"
 		bb := make([]int, 0, 1000000)

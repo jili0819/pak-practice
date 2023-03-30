@@ -14,6 +14,7 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+
 	/*infos := make([]TestTableA, 0)
 	for i := 0; i < 1000000; i++ {
 		v4uuid, err := uuid.NewV4()
@@ -24,13 +25,16 @@ func main() {
 	}
 	_ = db.CreateInBatches(&infos, 2000)*/
 	fmt.Println("----------")
-	var total bool
+	var result []B
 	//times := time.Now().Format("2006-01-02 15:04:05")
-	if err = db.Debug().Model(B{}).Select("count(1) > 0").Where("id  = ?", 1000).Find(&total).Error; err != nil {
+	if err = db.Debug().Model(B{}).
+		Select("*").
+		Where("id  <= ?", 100).
+		Find(&result).Error; err != nil {
 		fmt.Println(err.Error())
 		return
 	}
-	fmt.Println("total:", total)
+	fmt.Println("total:", result)
 }
 
 type TestTableA struct {

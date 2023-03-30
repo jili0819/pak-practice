@@ -1,5 +1,13 @@
 package main
 
+import (
+	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+)
+
 //
 //var PoolLimit chan struct{}
 //
@@ -42,14 +50,26 @@ package main
 //}
 
 func main() {
-	a := A{}
-	NewPool(10).AddFunc(a.PoolExecute)
-}
-
-type A struct {
-	Name string
-}
-
-func (a *A) PoolExecute(x interface{}) {
-
+	closeChan := make(chan struct{})
+	sigCh := make(chan os.Signal)
+	signal.Notify(sigCh, syscall.SIGHUP, syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT)
+	errChan := make(chan error, 1)
+	go func() {
+		sig := <-sigCh
+		switch sig {
+		case syscall.SIGHUP, syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT:
+			closeChan <- struct{}{}
+		}
+	}()
+	go func() {
+		select {
+		case <-closeChan:
+			fmt.Println("get exit signal")
+		case er := <-errChan:
+			fmt.Println(fmt.Sprintf("accept error: %s", er.Error()))
+		}
+		fmt.Println("shutting down...")
+		fmt.Println("close end")
+	}()
+	time.Sleep(10 * time.Second)
 }
