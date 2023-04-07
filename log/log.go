@@ -21,19 +21,14 @@ var log *zap.Logger
 var writer zapcore.WriteSyncer
 
 func main() {
-	var a [1]int64
-	a[0] = time.Now().Local().Unix()
-	fmt.Println(a[0])
-	//a[1] = time.Now().Local().Unix()
-
 	/*core := zapcore.NewCore(getEncoder(), getWriteSyncer(), zapcore.DebugLevel)
 	zap.New(core, zap.AddCaller())*/
 	_onceInit.Do(func() {
 		fmt.Println("init log")
 		writer = getStdLogWriter()
-		if MODE == "pro" {
-			writer = getFileLogWriter()
-		}
+		//if MODE == "pro" {
+		//	writer = getFileLogWriter()
+		//}
 		// 开启开发模式，堆栈跟踪
 		caller := zap.AddCaller()
 		// 开启文件及行号
@@ -55,8 +50,8 @@ func main() {
 }
 
 func getEncoder() zapcore.Encoder {
-	encoderConfig := zap.NewDevelopmentEncoderConfig()
-	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder // 修改时间编码器
+	encoderConfig := zap.NewProductionEncoderConfig()
+	encoderConfig.EncodeTime = zapcore.TimeEncoderOfLayout("2006-01-02 15:04:05") // 修改时间编码器
 	encoderConfig.MessageKey = "message"
 	encoderConfig.LevelKey = "level"
 	encoderConfig.TimeKey = "timestamp"
@@ -64,7 +59,10 @@ func getEncoder() zapcore.Encoder {
 	// 在日志文件中使用大写字母记录日志级别
 	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
 	// NewConsoleEncoder 打印更符合人们观察的方式
-	return zapcore.NewJSONEncoder(encoderConfig)
+	if MODE == "pro" {
+		return zapcore.NewJSONEncoder(encoderConfig)
+	}
+	return zapcore.NewConsoleEncoder(encoderConfig)
 }
 
 func getFileLogWriter() zapcore.WriteSyncer {
