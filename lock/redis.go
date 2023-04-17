@@ -33,9 +33,8 @@ func NewRedisLock(ctx context.Context, client *redis.Client, key string, value s
 	return instancLock
 }
 
-func (c *RedisLock) SetExpiration(expiration time.Duration) *RedisLock {
+func (c *RedisLock) SetExpiration(expiration time.Duration) {
 	c.expiration = expiration
-	return c
 }
 
 // 单次加锁
