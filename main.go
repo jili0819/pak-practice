@@ -1,11 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 func main() {
 
-	b := GG()
-	fmt.Println(len(b))
+	fmt.Println(2 * time.Second / 3)
 
 }
 

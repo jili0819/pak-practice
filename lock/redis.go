@@ -2,60 +2,80 @@ package main
 
 import (
 	"context"
-	"github.com/go-redis/redis/v8"
-	"github.com/jili/pkg-practice/lock/sync_map"
-	"log"
-	"sync"
 	"time"
+
+	"github.com/go-redis/redis/v8"
 )
 
-const DefaultLockTime = time.Second * 3
-
-var (
-	rdb  *redis.Client
-	once sync.Once
+const (
+	LockPrefix        = "{redis_lock}_"
+	DefaultExpiration = 5
 )
 
-func GetRedisClient() *redis.Client {
-	if rdb != nil {
-		return rdb
+type RedisLock struct {
+	ctx        context.Context
+	key        string
+	value      string
+	client     *redis.Client
+	expiration time.Duration
+	cancelFunc context.CancelFunc
+}
+
+func NewRedisLock(ctx context.Context, client *redis.Client, key string, value string) *RedisLock {
+	instancLock := &RedisLock{
+		ctx:        ctx,
+		key:        LockPrefix + key,
+		value:      value,
+		client:     client,
+		expiration: time.Duration(DefaultExpiration) * time.Second,
 	}
-	once.Do(func() {
-		rdb = newRedisClient()
-	})
-	return rdb
+	return instancLock
 }
 
-func newRedisClient() *redis.Client {
-	return redis.NewClient(&redis.Options{
-		Addr: ":6379",
-	})
+func (c *RedisLock) SetExpiration(expiration time.Duration) *RedisLock {
+	c.expiration = expiration
+	return c
 }
 
-func Lock(ctx context.Context, mx *sync_map.KeyedMutex, key string) error {
-	unlock := mx.Lock(key)
-	defer unlock()
-	_, err := GetRedisClient().SetNX(ctx, key, 1, DefaultLockTime).Result()
+func (c *RedisLock) TryLock() (success bool, err error) {
+	success, err = c.client.SetNX(c.ctx, c.key, c.value, c.expiration).Result()
 	if err != nil {
-		log.Println(err.Error())
+		return
 	}
-	return err
+	ctx, cancel := context.WithCancel(c.ctx)
+	c.cancelFunc = cancel
+	c.renew(ctx)
+	return
 }
 
-func UnLock(ctx context.Context, key string) error {
-	_, err := GetRedisClient().Del(ctx, key).Result()
-	if err != nil {
-		log.Println(err.Error())
-		return err
+func (c *RedisLock) Lock() error {
+	for {
+		success, err := c.TryLock()
+		if err != nil {
+			return err
+		}
+		if success {
+			return nil
+		}
 	}
 	return nil
 }
 
-func LockExpire(ctx context.Context, key string) error {
-	_, err := GetRedisClient().Expire(ctx, key, time.Second*1).Result()
-	if err != nil {
-		log.Println(err.Error())
-		return err
-	}
-	return err
+func (c *RedisLock) UnLock() (err error) {
+	c.cancelFunc() //cancel renew goroutine
+	return
+}
+
+func (c *RedisLock) renew(ctx context.Context) {
+	go func() {
+		ticker := time.NewTicker(c.expiration / 3)
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				c.client.Expire(ctx, c.key, c.expiration).Result()
+			}
+		}
+	}()
 }
