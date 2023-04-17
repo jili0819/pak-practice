@@ -8,8 +8,9 @@ import (
 )
 
 const (
-	LockPrefix        = "{redis_lock}_"
-	DefaultExpiration = 5
+	LockPrefix          = "{redis_lock}_"
+	DefaultExpiration   = 5
+	DefaultSpinInterval = 50
 )
 
 type RedisLock struct {
@@ -37,6 +38,7 @@ func (c *RedisLock) SetExpiration(expiration time.Duration) *RedisLock {
 	return c
 }
 
+// 单次加锁
 func (c *RedisLock) TryLock() (success bool, err error) {
 	success, err = c.client.SetNX(c.ctx, c.key, c.value, c.expiration).Result()
 	if err != nil {
@@ -48,6 +50,7 @@ func (c *RedisLock) TryLock() (success bool, err error) {
 	return
 }
 
+// Lock 加锁
 func (c *RedisLock) Lock() error {
 	for {
 		success, err := c.TryLock()
@@ -57,15 +60,17 @@ func (c *RedisLock) Lock() error {
 		if success {
 			return nil
 		}
+		time.Sleep(time.Millisecond * DefaultSpinInterval) // 防止过快
 	}
-	return nil
 }
 
-func (c *RedisLock) UnLock() (err error) {
+// UnLock 解锁
+func (c *RedisLock) UnLock() {
 	c.cancelFunc() //cancel renew goroutine
 	return
 }
 
+// renem 续期锁
 func (c *RedisLock) renew(ctx context.Context) {
 	go func() {
 		ticker := time.NewTicker(c.expiration / 3)

@@ -18,10 +18,12 @@ func main() {
 }
 
 // err-group
-func lock01() {
+func lock01() error {
 	ch := make(chan bool)
 	lock := NewRedisLock(context.Background(), nil, "keys", "values")
-	lock.Lock()
+	if err := lock.Lock(); err != nil {
+		return err
+	}
 	defer lock.UnLock()
 	fmt.Println("执行业务开始")
 	time.Sleep(5 * time.Second)
