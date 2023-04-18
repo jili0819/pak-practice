@@ -20,7 +20,8 @@ func main() {
 // err-group
 func lock01() error {
 	ch := make(chan bool)
-	lock := NewRedisLock(context.Background(), nil, "keys", "values")
+
+	lock := new(context.Background(), nil, "keys", "values")
 	if err := lock.Lock(); err != nil {
 		return err
 	}
