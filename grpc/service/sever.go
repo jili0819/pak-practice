@@ -5,7 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"github.com/jili/pkg-practice/grpc/rpcpb/rpcpb1"
+	rpcpb12 "github.com/jili/pkg-practice/grpc/rpcpb/proto/rpcpb1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
@@ -27,13 +27,13 @@ var (
 
 // server is used to implement helloworld.GreeterServer.
 type server struct {
-	rpcpb1.UnimplementedGreeterServer
+	rpcpb12.UnimplementedGreeterServer
 }
 
 // SayHello implements helloworld.GreeterServer
-func (s *server) SayHello(ctx context.Context, in *rpcpb1.HelloRequest) (*rpcpb1.HelloReply, error) {
+func (s *server) SayHello(ctx context.Context, in *rpcpb12.HelloRequest) (*rpcpb12.HelloReply, error) {
 	log.Printf("Received: %v", in.GetName())
-	return &rpcpb1.HelloReply{Message: "Hello " + in.GetName()}, nil
+	return &rpcpb12.HelloReply{Message: "Hello " + in.GetName()}, nil
 }
 
 func main() {
@@ -68,7 +68,7 @@ func main() {
 	signal.Notify(stopChan, syscall.SIGTERM, syscall.SIGINT, syscall.SIGKILL)
 
 	s := grpc.NewServer(grpc.Creds(creds))
-	rpcpb1.RegisterGreeterServer(s, &server{})
+	rpcpb12.RegisterGreeterServer(s, &server{})
 
 	// grpcui -plaintext 127.0.0.1:8090
 	reflection.Register(s) // grpcui本地测试调用grpc服务

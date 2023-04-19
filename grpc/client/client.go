@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"github.com/jili/pkg-practice/grpc/rpcpb/rpcpb1"
+	rpcpb12 "github.com/jili/pkg-practice/grpc/rpcpb/proto/rpcpb1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"log"
@@ -21,12 +21,12 @@ func main() {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
-	c := rpcpb1.NewGreeterClient(conn)
+	c := rpcpb12.NewGreeterClient(conn)
 
 	// Contact the server and print out its response.
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	r, err := c.SayHello(ctx, &rpcpb1.HelloRequest{Name: "name21431"})
+	r, err := c.SayHello(ctx, &rpcpb12.HelloRequest{Name: "name21431"})
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
 	}
