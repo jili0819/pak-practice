@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/jili/pkg-practice/gin/middleware"
 	"runtime"
 )
 
@@ -32,6 +33,7 @@ func main() {
 	//h.EnableMemDump().Start()
 
 	g := gin.Default()
+	g.Use(middleware.TimeMiddleware())
 	g.GET("/", func(c *gin.Context) {
 		return
 	})
