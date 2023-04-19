@@ -7,7 +7,7 @@ import (
 
 func main() {
 
-	fmt.Println(2 * time.Second / 3)
+	fmt.Println(time.Now().Truncate(time.Minute).Unix())
 
 }
 

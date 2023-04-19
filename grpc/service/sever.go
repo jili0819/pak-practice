@@ -12,6 +12,9 @@ import (
 	"io/ioutil"
 	"log"
 	"net"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 var (
@@ -60,13 +63,26 @@ func main() {
 		ClientCAs:    certPool,
 	})
 
+	errChan := make(chan error)
+	stopChan := make(chan os.Signal)
+	signal.Notify(stopChan, syscall.SIGTERM, syscall.SIGINT, syscall.SIGKILL)
+
 	s := grpc.NewServer(grpc.Creds(creds))
-	defer s.GracefulStop()
 	rpcpb1.RegisterGreeterServer(s, &server{})
 
 	// grpcui -plaintext 127.0.0.1:8090
 	reflection.Register(s) // grpcui本地测试调用grpc服务
-	if err = s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+	go func() {
+		if err = s.Serve(lis); err != nil {
+			errChan <- err
+			log.Fatalf("failed to serve: %v", err)
+		}
+	}()
+	defer func() {
+		s.GracefulStop()
+	}()
+	select {
+	case <-errChan:
+	case <-stopChan:
 	}
 }
