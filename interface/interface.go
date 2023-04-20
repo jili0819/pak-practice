@@ -1,25 +1,32 @@
-package _interface
+package main
+
+import "fmt"
 
 type ApiInterface interface {
 	// Add 方法一
-	Add(a, b int64) (int64, error)
-	// Sums 方法二
-	Sums(a, b int64) (int64, error)
+	Add(a int64) ApiInterface
+	GetSum() int64
 }
 
-type abbApiClient struct {
-	X int64 `json:"x"`
-	Y int64 `json:"y"`
+type addApiClient struct {
+	Sum int64 `json:"sum"`
+	X   int64 `json:"x"`
+	Y   int64 `json:"y"`
 }
 
-func NewApi() ApiInterface {
-	return &abbApiClient{}
+func NewAddApi() ApiInterface {
+	return &addApiClient{}
 }
 
-func (api *abbApiClient) Add(a, b int64) (int64, error) {
-	return a + b, nil
+func (api *addApiClient) Add(x int64) ApiInterface {
+	api.Sum += x
+	return api
 }
 
-func (api *abbApiClient) Sums(a, b int64) (int64, error) {
-	return a + b, nil
+func (api *addApiClient) GetSum() int64 {
+	return api.Sum
+}
+
+func main() {
+	fmt.Println(NewAddApi().Add(1).Add(3).Add(5).Add(1).GetSum())
 }
