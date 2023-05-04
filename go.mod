@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/HdrHistogram/hdrhistogram-go v1.1.2 // indirect
+	github.com/PuerkitoBio/goquery v1.8.1 // indirect
 	github.com/apache/rocketmq-client-go/v2 v2.1.1
 	github.com/confluentinc/confluent-kafka-go v1.9.2
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
@@ -11,6 +12,7 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.3.0+incompatible
 	github.com/gorilla/mux v1.8.0
+	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba // indirect
 	github.com/klauspost/compress v1.15.11 // indirect
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/opentracing/opentracing-go v1.2.0
@@ -28,6 +30,7 @@ require (
 	go.uber.org/goleak v1.2.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.23.0
+	golang.org/x/net v0.9.0 // indirect
 	golang.org/x/sync v0.1.0
 	google.golang.org/genproto v0.0.0-20221207170731-23e4bf6bdc37 // indirect
 	google.golang.org/grpc v1.51.0
