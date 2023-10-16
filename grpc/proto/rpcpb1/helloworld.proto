@@ -22,4 +22,8 @@ message HelloReply {
 
 // generate pb.go
 // 项目根目录下执行即可
+
+// go install google.golang.org/protobuf/cmd/protoc-gen-go
+// go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
+
 // protoc --go_out=. --go-grpc_out=. grpc/rpcpb/rpcpb2/helloworld.proto

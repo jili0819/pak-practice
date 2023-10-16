@@ -23,7 +23,7 @@ func StartRouter() {
 	authRouter := v1.PathPrefix("/auth").Subrouter()
 	{
 		authRouter.HandleFunc("/login", func(writer http.ResponseWriter, request *http.Request) {
-			token, err := jwt.GenToken(1, time.Now().Unix()+86400)
+			token, err := jwt.GenToken(1, time.Now().Add(time.Hour*24))
 			if err != nil {
 				ResponseError(writer, errcode.New400Error(err.Error()))
 				return

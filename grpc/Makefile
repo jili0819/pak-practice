@@ -1,6 +1,6 @@
 tls-config-name := tls-config
 tls-config := $(shell pwd)/$(tls-config-name)
-
+.PHONY: build clean run proto tls
 default:
 	echo $(tls-config)
 	mkdir $(tls-config-name)
@@ -36,3 +36,4 @@ default:
  
 clean:
 	rm -rf $(tls-config)
+

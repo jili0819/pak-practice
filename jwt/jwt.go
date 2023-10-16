@@ -2,7 +2,8 @@ package jwt
 
 import (
 	"errors"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt/v5"
+	"time"
 )
 
 var (
@@ -15,18 +16,18 @@ var (
 // 我们这里需要额外记录一个username字段，所以要自定义结构体
 // 如果想要保存更多信息，都可以添加到这个结构体中
 type MyClaims struct {
-	UserID int64
-	jwt.StandardClaims
+	UserID int64 `json:"user_id"`
+	jwt.RegisteredClaims
 }
 
 // GenToken 生成JWT
-func GenToken(userID int64, expireAt int64) (string, error) {
+func GenToken(userID int64, expireAt time.Time) (string, error) {
 	// 创建一个我们自己的声明
 	c := MyClaims{
 		UserID: userID,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expireAt, // 过期时间
-			Issuer:    issuer,   // 签发人
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expireAt), // 过期时间
+			Issuer:    issuer,                       // 签发人
 		},
 	}
 	// 使用指定的签名方法创建签名对象

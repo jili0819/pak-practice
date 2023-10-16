@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-
+	fmt.Println("hello world")
 }
 
 func getUrlContent(url string) {
