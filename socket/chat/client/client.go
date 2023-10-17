@@ -81,7 +81,11 @@ func (c *Client) readPump() {
 			break
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		c.send <- message
+		// 群发消息
+		c.hub.broadcast <- message
+		// 单人发送
+		// c.send <- message
+
 		c.colseTimer = time.NewTimer(maxKeepTime)
 	}
 }
