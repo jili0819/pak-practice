@@ -30,6 +30,7 @@ func main() {
 	http.HandleFunc("/", serveHome)
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		client.ServeWs(hub, w, r)
+		return
 	})
 	server := &http.Server{
 		Addr:              *addr,

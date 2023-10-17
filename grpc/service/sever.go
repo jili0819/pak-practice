@@ -44,6 +44,9 @@ func (s *server) SayHello(ctx context.Context, in *rpcpb1.HelloRequest) (*rpcpb1
 // 我们在用go 1.15版本以上，用gRPC通过TLS建立安全连接时，会出现证书报错问题：
 // panic: rpc error: code = Unavailable desc = connection error: desc = "transport: authentication handshake failed: x509: certificate
 // is not valid for any names, but wanted to match localhost"
+
+// https://github.com/grpc/grpc-go/blob/master/examples/features/encryption/mTLS/server/main.go
+
 func main() {
 
 	certificate, err := tls.LoadX509KeyPair(server_crt, server_key)

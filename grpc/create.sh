@@ -1,4 +1,5 @@
 #!/bin/bash
+# https://github.com/grpc/grpc-go/blob/master/examples/data/x509/create.sh
 if [ -d "./cert" ]; then
     echo "cert exist, skip create"
 else

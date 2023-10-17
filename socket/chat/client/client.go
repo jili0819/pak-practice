@@ -2,6 +2,9 @@ package client
 
 import (
 	"bytes"
+	"errors"
+	"fmt"
+	"github.com/gofrs/uuid"
 	"log"
 	"net/http"
 	"time"
@@ -11,13 +14,15 @@ import (
 
 const (
 	// Time allowed to write a message to the peer.
-	writeWait = 10 * time.Second
+	writeWait = 5 * time.Second
 
 	// Time allowed to read the next pong message from the peer.
-	pongWait = 60 * time.Second
+	pongWait = 10 * time.Second
 
 	// Send pings to peer with this period. Must be less than pongWait.
-	pingPeriod = (pongWait * 9) / 10
+	pingPeriod = (pongWait * 8) / 10
+
+	maxKeepTime = 60 * time.Second
 
 	// Maximum message size allowed from peer.
 	maxMessageSize = 1024
@@ -35,6 +40,8 @@ var upgrader = websocket.Upgrader{
 
 // Client is a middleman between the websocket connection and the hub.
 type Client struct {
+	uuid string
+
 	hub *Hub
 
 	// The websocket connection.
@@ -42,6 +49,8 @@ type Client struct {
 
 	// Buffered channel of outbound messages.
 	send chan []byte
+
+	colseTimer *time.Timer
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -59,18 +68,21 @@ func (c *Client) readPump() {
 	c.conn.SetPongHandler(func(string) error {
 		_ = c.conn.SetReadDeadline(time.Now().Add(pongWait))
 		return nil
-	},
-	)
+	})
 	for {
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", err)
+				var closeError *websocket.CloseError
+				if errors.As(err, &closeError) {
+					log.Printf(fmt.Sprintf("ReadMessage error code %d, error: %v", err.(*websocket.CloseError).Code, err))
+				}
 			}
 			break
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		c.hub.broadcast <- message
+		c.send <- message
+		c.colseTimer = time.NewTimer(maxKeepTime)
 	}
 }
 
@@ -112,10 +124,17 @@ func (c *Client) writePump() {
 				return
 			}
 		case <-ticker.C:
-			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
-			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+			if err := c.conn.SetWriteDeadline(time.Now().Add(writeWait)); err != nil {
+
 				return
 			}
+			if err := c.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+				fmt.Printf("websocket.PingMessage,err : %v\n", err)
+				return
+			}
+		case <-c.colseTimer.C:
+			fmt.Printf("websocket timeout, close it\n")
+			return
 		}
 	}
 }
@@ -127,7 +146,8 @@ func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
+	newV6, _ := uuid.NewV6()
+	client := &Client{uuid: newV6.String(), hub: hub, conn: conn, send: make(chan []byte, 256), colseTimer: time.NewTimer(maxKeepTime)}
 	client.hub.register <- client
 
 	// Allow collection of memory referenced by the caller by doing all work in

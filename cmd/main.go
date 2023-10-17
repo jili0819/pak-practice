@@ -67,7 +67,7 @@ func main() {
 			Flags:   []cli.Flag{&stringFlag, &intFlag},
 		},
 		{
-			//go run main.go run
+			//go run server.go run
 			Name:    "run",
 			Aliases: []string{},
 			Usage:   "Run the demo",

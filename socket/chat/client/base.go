@@ -34,6 +34,7 @@ func (h *Hub) Run() {
 			if _, ok := h.clients[clientInfo]; ok {
 				delete(h.clients, clientInfo)
 				close(clientInfo.send)
+				clientInfo.conn.Close()
 			}
 		case message := <-h.broadcast:
 			for clientInfo := range h.clients {
