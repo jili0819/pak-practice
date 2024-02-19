@@ -1,12 +1,13 @@
 module github.com/jili/pkg-practice
 
-go 1.16
+go 1.20
 
 require (
 	github.com/HdrHistogram/hdrhistogram-go v1.1.2 // indirect
 	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/apache/rocketmq-client-go/v2 v2.1.1
 	github.com/confluentinc/confluent-kafka-go v1.9.2
+	github.com/elastic/go-elasticsearch/v8 v8.10.1
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofrs/uuid v4.4.0+incompatible
@@ -14,6 +15,7 @@ require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/websocket v1.5.0
+	github.com/guonaihong/gout v0.3.9
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
 	github.com/klauspost/compress v1.15.11 // indirect
 	github.com/natefinch/lumberjack v2.0.0+incompatible

@@ -3,8 +3,8 @@ package main
 import (
 	"encoding/json"
 	"github.com/gofrs/uuid"
-	"github.com/jili/pkg-practice/kafka/base"
-	"github.com/jili/pkg-practice/kafka/types"
+	"github.com/jili/pkg-practice/kafka/confluent/base"
+	"github.com/jili/pkg-practice/kafka/confluent/types"
 	"time"
 )
 

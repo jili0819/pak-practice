@@ -10,12 +10,12 @@ import (
 )
 
 func main() {
-	c, err := rocketmq.NewPushConsumer(
+	c, _ := rocketmq.NewPushConsumer(
 		consumer.WithNameServer([]string{"localhost:9876"}),
 		consumer.WithConsumerModel(consumer.Clustering),
 		consumer.WithGroupName("GID_XXXXXX"),
 	)
-	err := c.Subscribe("test", consumer.MessageSelector{}, func(ctx context.Context,
+	_ = c.Subscribe("test", consumer.MessageSelector{}, func(ctx context.Context,
 		msgs ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
 		rlog.Info("Subscribe Callback", map[string]interface{}{"msgs": msgs})
 		for _, msg := range msgs {
