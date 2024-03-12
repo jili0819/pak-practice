@@ -22,33 +22,30 @@ func main() {
 	defer func() {
 		_ = etcdCli.Close()
 	}()
-	ctx, ctxCancel := context.WithCancel(context.Background())
-	defer func() {
-		ctxCancel()
-	}()
+	ctx, _ := context.WithTimeout(context.Background(), time.Second)
 	// put
-	_, err = etcdCli.Put(ctx, "key1", "value1")
+	_, err = etcdCli.Put(ctx, "q1mi", "dsb")
+
 	if err != nil {
-		log.Fatal("put err", err)
+		fmt.Printf("put to etcd failed, err:%v\n", err)
 		return
 	}
 	fmt.Println("pus etcd success")
 	// get
 	resp, err := etcdCli.Get(ctx, "key1")
 	if err != nil {
-		log.Fatal("get err", err)
+		log.Fatal("get err:", err)
 		return
 	}
 	for _, ev := range resp.Kvs {
-		fmt.Println(string(ev.Key))
-		fmt.Println(string(ev.Value))
+		fmt.Printf("%s:%s\n", ev.Key, ev.Value)
 		fmt.Println(ev.Lease)
 	}
 
 	// watch one key
 	//ch1 := etcdCli.Watch(ctx, "k8s:")
 	// watch all key
-	ch1 := etcdCli.Watch(ctx, "k8s:", clientv3.WithPrefix())
+	/*ch1 := etcdCli.Watch(ctx, "k8s:", clientv3.WithPrefix())
 	go func(ctx context.Context) {
 		for {
 			select {
@@ -63,5 +60,5 @@ func main() {
 			}
 		}
 	}(ctx)
-	time.Sleep(5 * time.Second)
+	time.Sleep(5 * time.Second)*/
 }
