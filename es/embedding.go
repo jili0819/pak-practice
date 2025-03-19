@@ -13,8 +13,8 @@ func main() {
 		Addresses: []string{
 			"http://es-cn-pvh45ggap000h3ju6.elasticsearch.aliyuncs.com:9200",
 		},
-		Username: "elastic",
-		Password: "Buzhongyao123",
+		Username: "***",
+		Password: "***",
 	}
 	es, err := elasticsearch.NewTypedClient(cfg)
 	if err != nil {
