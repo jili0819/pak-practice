@@ -5,12 +5,17 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/jackdanger/collectlinks"
 	"net/http"
+	"os/exec"
 	"regexp"
 	"sort"
 )
 
 func main() {
-	fmt.Println("hello world")
+	cmd := exec.Command("ls", "-l")
+	ou := cmd.Environ()
+	fmt.Println(ou)
+	//output, err := cmd.CombinedOutput() // 执行并获取输出[3,6](@ref)
+	//fmt.Println(string(output), err)
 }
 
 func getUrlContent(url string) {
