@@ -20,7 +20,7 @@ func main() {
 				Name: uuid.String(),
 			})
 			aa.Produce("purchases2", [][]byte{jsonstr}, 0)
-			time.Sleep(200 * time.Millisecond)
+			time.Sleep(5 * time.Second)
 		}
 	}()
 	time.Sleep(1 * time.Hour)

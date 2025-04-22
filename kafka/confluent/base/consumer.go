@@ -1,6 +1,6 @@
 package base
 
-import "github.com/confluentinc/confluent-kafka-go/kafka"
+import "github.com/confluentinc/confluent-kafka-go/v2/kafka"
 
 type BaseConsumer struct {
 	Base     *kafka.Consumer

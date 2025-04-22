@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"github.com/jili/pkg-practice/kafka/confluent/base"
 	"github.com/jili/pkg-practice/kafka/confluent/types"
 	"go.uber.org/zap"
@@ -85,6 +85,7 @@ func main() {
 				case *kafka.Message:
 					fmt.Println("消费者groupId:", index)
 					aa.Consumer.Callback(e.TopicPartition, e.Value)
+					aa.Consumer.Base.Commit()
 				case kafka.Error:
 					// Errors should generally be considered
 					// informational, the client will try to
