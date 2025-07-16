@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jili/pkg-practice/gin/middleware"
-	"runtime"
+	"io"
+	"time"
 )
 
 type TypeName struct {
@@ -21,21 +23,39 @@ type Req struct {
 }
 
 func main() {
-	runtime.GOMAXPROCS(runtime.NumCPU() - 1)
-	// proof auto
-	//h, _ := holmes.New(
-	//	holmes.WithCollectInterval("2s"),
-	//	holmes.WithDumpPath("./tmp"),
-	//	holmes.WithLogger(holmes.NewFileLog("./tmp/holmes.log", mlog.DEBUG)),
-	//	holmes.WithTextDump(),
-	//	holmes.WithMemDump(3, 25, 80, time.Second),
-	//)
-	//h.EnableMemDump().Start()
+	_, c := context.WithCancel(context.Background())
+	defer c()
+	c()
+
+	return
 
 	g := gin.Default()
 	g.Use(middleware.TimeMiddleware())
 	g.GET("/", func(c *gin.Context) {
 		return
+	})
+	g.GET("/sse", func(c *gin.Context) {
+		_, newCancel := context.WithCancel(context.Background())
+		// 设置 SSE Header
+		c.Writer.Header().Set("Content-Type", "text/event-stream")
+		c.Writer.Header().Set("Cache-Control", "no-cache")
+		c.Writer.Header().Set("Connection", "keep-alive")
+		i := 0
+		c.Stream(func(w io.Writer) bool {
+			for {
+				if i > 100 {
+					newCancel()
+					break
+				}
+				fmt.Println("i:", i)
+				time.Sleep(1 * time.Second)
+				// 发送数据
+				_, _ = fmt.Fprintf(w, "data: [heartbeat]\n\n")
+				c.Writer.Flush()
+				i++
+			}
+			return false
+		})
 	})
 	g.GET("/get", func(c *gin.Context) {
 		data := "Hello, go-stress-testing! \n"

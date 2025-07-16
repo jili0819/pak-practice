@@ -2,25 +2,43 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-	"net/url"
-	"path"
-	"strings"
+	"regexp"
+	"unicode/utf8"
 )
 
-func main() {
-
-	resp, err := http.Head("https://wos.develop.meetwhale.com/d_I2PJa7-xFhAV738vXl-")
-	if err != nil {
-		panic(err)
+func TruncateTo8MBFast(s string) string {
+	maxBytes := 8 * 2 // 16b
+	//maxBytes := 8 * 1024 * 1024
+	if len(s) <= maxBytes {
+		return s
 	}
-	defer resp.Body.Close()
 
-	parsedURL, _ := url.Parse(resp.Request.URL.String())
+	truncated := s[:maxBytes]
+	// 处理尾部可能被截断的多字节字符
+	for i := 0; i < utf8.MaxRune; i++ {
+		if len(truncated)-i <= 0 {
+			break
+		}
+		if utf8.FullRune([]byte(truncated[:len(truncated)-i])) {
+			return truncated[:len(truncated)-i]
+		}
+	}
+	return ""
+}
 
-	// 解析Content-Disposition头
-	fmt.Println(path.Base(parsedURL.Path))
-	fmt.Println(strings.TrimPrefix(path.Ext(parsedURL.Path), "."))
+func main() {
+	// 正则表达式：匹配以字母/数字开头、以字母/数字结尾，中间允许0+个横线的子串
+	pattern := `[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?`
+	re := regexp.MustCompile(pattern)
+
+	input := "234-few、氛围服务"
+
+	// 提取所有匹配项
+	matches := re.FindAllString(input, -1)
+	fmt.Println("提取结果:")
+	for i, s := range matches {
+		fmt.Printf("%d: %q\n", i+1, s)
+	}
 }
 
 func SplitRuneChunks(s string, chunkSize int) [][]rune {
