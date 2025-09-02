@@ -94,7 +94,7 @@ func main() {
 					fmt.Fprintf(os.Stderr, "%% Error: %v: %v\n", e.Code(), e)
 					break
 				case kafka.OffsetsCommitted:
-					fmt.Printf("%v", e.String())
+					fmt.Printf("%v\n", e.String())
 				default:
 					fmt.Printf("default %v\n", e)
 				}
