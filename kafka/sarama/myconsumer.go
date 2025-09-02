@@ -61,11 +61,6 @@ func (c *MyConsumer) callBack(message *sarama.ConsumerMessage) {
 
 func main() {
 	// 组一
-	handle := NewMyConsumer(func(info *types.MyConsumerInfo) {
-		fmt.Println("自定义消费方法:start", time.Now().Format("2006-01-02 15:04:05"))
-		fmt.Println("自定义消费方法:", info.Name, time.Now().Format("2006-01-02 15:04:05"))
-		fmt.Println("自定义消费方法:end", time.Now().Format("2006-01-02 15:04:05"))
-	})
 	client := base.NewConsumerGroup([]string{"localhost:29092"}, "group")
 	ctx, cancel := context.WithCancel(context.Background())
 	wg := &sync.WaitGroup{}
@@ -73,8 +68,13 @@ func main() {
 		wg.Add(1)
 		go func(index int) {
 			defer wg.Done()
+			handle := NewMyConsumer(func(info *types.MyConsumerInfo) {
+				fmt.Println("自定义消费方法:start", time.Now().Format("2006-01-02 15:04:05"))
+				fmt.Println("自定义消费方法:", info.Name, time.Now().Format("2006-01-02 15:04:05"))
+				fmt.Println("自定义消费方法:end", time.Now().Format("2006-01-02 15:04:05"))
+			})
 			for {
-				err := client.Consume(ctx, []string{"purchases"}, &MyConsumer{})
+				err := client.Consume(ctx, []string{"purchases"}, handle)
 				if err != nil {
 					log.Fatal("kafka消费错误", zap.Error(err), zap.String("err", err.Error()))
 					return
@@ -83,7 +83,6 @@ func main() {
 				if ctx.Err() != nil {
 					return
 				}
-				handle.ready = make(chan bool)
 			}
 		}(i)
 	}
