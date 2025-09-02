@@ -20,7 +20,7 @@ func main() {
 			jsonstr, _ := json.Marshal(types.MyConsumerInfo{
 				Name: uuid.String(),
 			})
-			aa.Produce("purchases", [][]byte{jsonstr}, kafka.PartitionAny)
+			aa.Produce("purchases2", [][]byte{jsonstr}, kafka.PartitionAny)
 			time.Sleep(1 * time.Second)
 		}
 	}()
