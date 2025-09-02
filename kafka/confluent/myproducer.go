@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"github.com/gofrs/uuid"
 	"github.com/jili/pkg-practice/kafka/confluent/base"
 	"github.com/jili/pkg-practice/kafka/confluent/types"
@@ -19,7 +20,7 @@ func main() {
 			jsonstr, _ := json.Marshal(types.MyConsumerInfo{
 				Name: uuid.String(),
 			})
-			aa.Produce("purchases2", [][]byte{jsonstr}, 0)
+			aa.Produce("purchases2", [][]byte{jsonstr}, kafka.PartitionAny)
 			time.Sleep(5 * time.Second)
 		}
 	}()

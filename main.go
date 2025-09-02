@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"regexp"
+	"time"
 	"unicode/utf8"
 )
 
@@ -27,18 +27,21 @@ func TruncateTo8MBFast(s string) string {
 }
 
 func main() {
-	// 正则表达式：匹配以字母/数字开头、以字母/数字结尾，中间允许0+个横线的子串
-	pattern := `[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?`
-	re := regexp.MustCompile(pattern)
-
-	input := "234-few、氛围服务"
-
-	// 提取所有匹配项
-	matches := re.FindAllString(input, -1)
-	fmt.Println("提取结果:")
-	for i, s := range matches {
-		fmt.Printf("%d: %q\n", i+1, s)
+	ch := make(chan struct{}, 2)
+	for i := 0; i < 10; i++ {
+		ch <- struct{}{}
+		go func(s int) {
+			fmt.Println(fmt.Sprintf("hello world %d", s))
+			time.Sleep(2 * time.Second)
+			<-ch
+		}(i)
 	}
+
+	// 使用sts token创建 imm client
+	/*
+	 */
+	//oss.New("oss-cn-hangzhou.aliyuncs.com", "LTAI5tMCNyg9zqxhAZzn9gQn", "<KEY>")
+
 }
 
 func SplitRuneChunks(s string, chunkSize int) [][]rune {

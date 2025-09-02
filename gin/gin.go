@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/jili/pkg-practice/gin/middleware"
 	"io"
 	"time"
 )
@@ -23,15 +22,23 @@ type Req struct {
 }
 
 func main() {
-	_, c := context.WithCancel(context.Background())
-	defer c()
-	c()
-
-	return
-
 	g := gin.Default()
-	g.Use(middleware.TimeMiddleware())
-	g.GET("/", func(c *gin.Context) {
+	g.POST("/", func(c *gin.Context) {
+		c.JSON(401, gin.H{
+			"message": "unauthorized",
+		})
+		c.Abort()
+		return
+	})
+	g.POST("/notify", func(c *gin.Context) {
+		fmt.Println(c.Request.URL)
+		fmt.Println("-------")
+		fmt.Println(c.Request.RequestURI)
+		fmt.Println("-------")
+		fmt.Println(c.Request.Header)
+		fmt.Println("-------")
+		cc, _ := c.GetRawData()
+		fmt.Println(string(cc))
 		return
 	})
 	g.GET("/sse", func(c *gin.Context) {
@@ -65,7 +72,7 @@ func main() {
 		c.Writer.Write([]byte(data))
 		return
 	})
-	g.Run(":8080")
+	g.Run(":4000")
 }
 
 /*import (

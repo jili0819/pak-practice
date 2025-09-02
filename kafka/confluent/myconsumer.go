@@ -27,7 +27,7 @@ func NewMyConsumer(topics []string, groupId, offset string, callBack MyConsumerC
 		callBackFunc = c.callBack1
 	}
 	c.Consumer = base.NewBaseConsumer(&kafka.ConfigMap{
-		"bootstrap.servers": "localhost:9092",
+		"bootstrap.servers": "localhost:29092",
 		"group.id":          groupId,
 		"auto.offset.reset": offset,
 	}, callBackFunc)
@@ -37,7 +37,7 @@ func NewMyConsumer(topics []string, groupId, offset string, callBack MyConsumerC
 func (c *MyConsumer) callBack(partition kafka.TopicPartition, msg []byte) {
 	// todo 自定义方法1,msg string->json->struct{}
 
-	fmt.Println("callBack 消息所在partition：", *partition.Topic, partition.Partition)
+	fmt.Println(fmt.Sprintf("callBack topic:%s,消息所在partition：%d", *partition.Topic, partition.Partition))
 	var temp types.MyConsumerInfo
 	if err := json.Unmarshal(msg, &temp); err != nil {
 		fmt.Println("err:", err)
@@ -48,8 +48,7 @@ func (c *MyConsumer) callBack(partition kafka.TopicPartition, msg []byte) {
 
 func (c *MyConsumer) callBack1(partition kafka.TopicPartition, msg []byte) {
 	// todo 自定义方法,msg string->json->struct{}
-
-	fmt.Println("callBack1 消息所在partition：", *partition.Topic, partition.Partition)
+	fmt.Println(fmt.Sprintf("callBack1 topic:%s,消息所在partition：%d", *partition.Topic, partition.Partition))
 	var temp types.MyConsumerInfo
 	if err := json.Unmarshal(msg, &temp); err != nil {
 		fmt.Println("err:", err)
@@ -60,7 +59,7 @@ func (c *MyConsumer) callBack1(partition kafka.TopicPartition, msg []byte) {
 
 func main() {
 	// 组一
-	aa := NewMyConsumer([]string{"purchases2"}, "test", "earliest", func(info *types.MyConsumerInfo) {
+	aa := NewMyConsumer([]string{"purchases2"}, "one", "earliest", func(info *types.MyConsumerInfo) {
 		fmt.Println("------MyConsumer--------:", info.Name, time.Now().Format("2006-01-02 15:04:05"))
 	})
 	// 组二
@@ -68,7 +67,7 @@ func main() {
 		fmt.Println("------MyConsumer--------:", info.Name, time.Now().Format("2006-01-02 15:04:05"))
 	})
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 2; i++ {
 		go func(index int) {
 			if err := aa.Consumer.Base.SubscribeTopics(aa.Topics, nil); err != nil {
 				log.Fatalf("kafka消费错误", zap.Error(err), zap.String("err", err.Error()))
@@ -83,9 +82,9 @@ func main() {
 
 				switch e := ev.(type) {
 				case *kafka.Message:
-					fmt.Println("消费者groupId:", index)
+					fmt.Println("消费者groupId:", "one")
 					aa.Consumer.Callback(e.TopicPartition, e.Value)
-					aa.Consumer.Base.Commit()
+					//aa.Consumer.Base.Commit()
 				case kafka.Error:
 					// Errors should generally be considered
 					// informational, the client will try to
@@ -94,8 +93,10 @@ func main() {
 					// the application if all brokers are down.
 					fmt.Fprintf(os.Stderr, "%% Error: %v: %v\n", e.Code(), e)
 					break
+				case kafka.OffsetsCommitted:
+					fmt.Printf("%v", e.String())
 				default:
-					fmt.Printf("Ignored %v\n", e)
+					fmt.Printf("default %v\n", e)
 				}
 				// aa.Consumer.Callback(msg.TopicPartition, msg.Value)
 				/*ev := <-aa.Consumer.BaseConsumer.Events()
@@ -107,7 +108,7 @@ func main() {
 		}(i)
 	}
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 2; i++ {
 		go func(index int) {
 			if err := bb.Consumer.Base.SubscribeTopics(bb.Topics, nil); err != nil {
 				log.Fatalf("kafka消费错误", zap.Error(err), zap.String("err", err.Error()))
@@ -122,7 +123,7 @@ func main() {
 
 				switch e := ev.(type) {
 				case *kafka.Message:
-					fmt.Println("消费者groupId:", index)
+					fmt.Println("消费者groupId:", "two")
 					bb.Consumer.Callback(e.TopicPartition, e.Value)
 				case kafka.Error:
 					// Errors should generally be considered
@@ -132,8 +133,10 @@ func main() {
 					// the application if all brokers are down.
 					fmt.Fprintf(os.Stderr, "%% Error: %v: %v\n", e.Code(), e)
 					break
+				case kafka.OffsetsCommitted:
+					fmt.Printf("%v", e.String())
 				default:
-					fmt.Printf("Ignored %v\n", e)
+					fmt.Printf("default %v\n", e)
 				}
 				// aa.Consumer.Callback(msg.TopicPartition, msg.Value)
 				/*ev := <-aa.Consumer.BaseConsumer.Events()

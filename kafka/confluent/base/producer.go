@@ -2,7 +2,7 @@ package base
 
 import (
 	"fmt"
-	"github.com/confluentinc/confluent-kafka-go/kafka"
+	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
 	"go.uber.org/zap"
 	"time"
 )
@@ -38,7 +38,7 @@ func (base *BaseProducer) Produce(topic string, messages [][]byte, partition int
 				if ev.TopicPartition.Error != nil {
 					fmt.Println("kafka生产失败 Failed to write access log entry", zap.Error(ev.TopicPartition.Error), zap.String("error", ev.TopicPartition.Error.Error()))
 				} else {
-					fmt.Println("kafka生产数据", zap.String("topic", *m.TopicPartition.Topic), zap.Int("partition", int(m.TopicPartition.Partition)), zap.Int("offset", int(m.TopicPartition.Offset)))
+					fmt.Println("kafka生产数据", zap.Any("topic", m.String()))
 				}
 			}
 		}
@@ -66,6 +66,6 @@ func (base *BaseProducer) Produce(topic string, messages [][]byte, partition int
 
 func getDefaultParams() *kafka.ConfigMap {
 	return &kafka.ConfigMap{
-		"bootstrap.servers": "localhost:9092", // kafka地址
+		"bootstrap.servers": "localhost:29092", // kafka地址
 	}
 }
