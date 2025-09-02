@@ -60,11 +60,16 @@ func (c *MyConsumer) callBack1(partition kafka.TopicPartition, msg []byte) {
 func main() {
 	// 组一
 	aa := NewMyConsumer([]string{"purchases2"}, "one", "earliest", func(info *types.MyConsumerInfo) {
-		fmt.Println("------MyConsumer--------:", info.Name, time.Now().Format("2006-01-02 15:04:05"))
+		fmt.Println("自定义消费方法:start", time.Now().Format("2006-01-02 15:04:05"))
+		fmt.Println("自定义消费方法:", info.Name, time.Now().Format("2006-01-02 15:04:05"))
+		fmt.Println("自定义消费方法:end", time.Now().Format("2006-01-02 15:04:05"))
+
 	})
 	// 组二
 	bb := NewMyConsumer([]string{"purchases2"}, "two", "earliest", func(info *types.MyConsumerInfo) {
-		fmt.Println("------MyConsumer--------:", info.Name, time.Now().Format("2006-01-02 15:04:05"))
+		fmt.Println("自定义消费方法:start", time.Now().Format("2006-01-02 15:04:05"))
+		fmt.Println("自定义消费方法：:", info.Name, time.Now().Format("2006-01-02 15:04:05"))
+		fmt.Println("自定义消费方法:end", time.Now().Format("2006-01-02 15:04:05"))
 	})
 
 	for i := 0; i < 2; i++ {
@@ -134,7 +139,7 @@ func main() {
 					fmt.Fprintf(os.Stderr, "%% Error: %v: %v\n", e.Code(), e)
 					break
 				case kafka.OffsetsCommitted:
-					fmt.Printf("%v", e.String())
+					fmt.Printf("%v\n", e.String())
 				default:
 					fmt.Printf("default %v\n", e)
 				}

@@ -21,7 +21,7 @@ func main() {
 				Name: uuid.String(),
 			})
 			aa.Produce("purchases2", [][]byte{jsonstr}, kafka.PartitionAny)
-			time.Sleep(5 * time.Second)
+			time.Sleep(1 * time.Second)
 		}
 	}()
 	time.Sleep(1 * time.Hour)
