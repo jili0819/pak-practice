@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/pkg/errors"
-	"github.com/prometheus/common/log"
 	"sync"
 	"time"
 )
@@ -60,7 +59,6 @@ func main() {
 }
 
 func handleError(err error) {
-	log.Errorf(err.Error())
 	//fmt.Println(log.Errorf(err.Error()))
 	return
 }

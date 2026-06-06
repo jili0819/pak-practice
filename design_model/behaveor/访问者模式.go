@@ -137,22 +137,50 @@ func (k *kpiTopVisitor) Publish() {
 	}
 }
 
+type Salary struct {
+	name  string
+	Total int
+}
+
 // salaryVisitor 薪酬访问者
-type salaryVisitor struct{}
+type salaryVisitor struct {
+	top []*Salary
+}
 
 func (s *salaryVisitor) VisitProductManager(pm *productManager) {
-	fmt.Printf("产品经理基本薪资：1000元，KPI单位薪资：100元，")
-	fmt.Printf("%s，总工资为%d元\n", pm.KPI(), (pm.productNum+pm.satisfaction)*100+1000)
+	//fmt.Printf("产品经理基本薪资：1000元，KPI单位薪资：100元，")
+	//fmt.Printf("%s，总工资为%d元\n", pm.KPI(), (pm.productNum+pm.satisfaction)*100+1000)
+	s.top = append(s.top, &Salary{
+		name:  pm.name,
+		Total: (pm.productNum+pm.satisfaction)*100 + 1000,
+	})
 }
 
 func (s *salaryVisitor) VisitSoftwareEngineer(se *softwareEngineer) {
-	fmt.Printf("软件工程师基本薪资：1500元，KPI单位薪资：80元，")
-	fmt.Printf("%s，总工资为%d元\n", se.KPI(), (se.requirementNum+se.bugNum)*80+1500)
+	//fmt.Printf("软件工程师基本薪资：1500元，KPI单位薪资：80元，")
+	//fmt.Printf("%s，总工资为%d元\n", se.KPI(), (se.requirementNum+se.bugNum)*80+1500)
+	s.top = append(s.top, &Salary{
+		name:  se.name,
+		Total: (se.requirementNum+se.bugNum)*80 + 1500,
+	})
 }
 
 func (s *salaryVisitor) VisitHR(hr *hr) {
-	fmt.Printf("人力资源基本薪资：800元，KPI单位薪资：120元，")
-	fmt.Printf("%s，总工资为%d元\n", hr.KPI(), hr.recruitNum*120+800)
+	//fmt.Printf("人力资源基本薪资：800元，KPI单位薪资：120元，")
+	//fmt.Printf("%s，总工资为%d元\n", hr.KPI(), hr.recruitNum*120+800)
+	s.top = append(s.top, &Salary{
+		name:  hr.name,
+		Total: hr.recruitNum*120 + 800,
+	})
+}
+
+func (s *salaryVisitor) Publish() {
+	sort.Slice(s.top, func(i, j int) bool {
+		return s.top[i].Total > s.top[j].Total
+	})
+	for i, curSalary := range s.top {
+		fmt.Printf("第%d名%s：总工资为%d元\n", i+1, curSalary.name, curSalary.Total)
+	}
 }
 
 func main() {
@@ -163,6 +191,7 @@ func main() {
 
 	salary := new(salaryVisitor) // 创建薪酬访问者
 	VisitAllEmployees(salary, allEmployees)
+	salary.Publish()
 }
 
 // AllEmployees 获得所有公司员工
